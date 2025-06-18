@@ -11,8 +11,11 @@ public class WallTile : MonoBehaviour
 
     private void OnTriggerExit (Collider other)
     {
-        wallSpawner.SpawnTile();
-        Destroy(gameObject, 3);
+        if (other.gameObject.name == "Player")
+        {
+            wallSpawner.SpawnTile();
+            Destroy(gameObject, 1);
+        }
     }
 
 }

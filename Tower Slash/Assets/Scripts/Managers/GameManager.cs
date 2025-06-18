@@ -15,6 +15,7 @@ public class GameManager : Singleton<GameManager>
     public GameObject player;
     public GameObject mainCamera;
     public GameObject wall;
+    public GameObject spawnFollower;
 
     private void Start()
     {
@@ -43,18 +44,26 @@ public class GameManager : Singleton<GameManager>
     public void GameStart()
     {
         GameState = GameState.GameStart;
+        SpawnerController.Instance.StartSpawning();
     }
 
     public void GameRestart()
     {
+        GameState = GameState.GameStart;
+        SpawnerController.Instance.StopSpawning();
+        SpawnerController.Instance.Reset();
+        SpawnerController.Instance.StartSpawning();
+
         player.GetComponent<Player>().Reset();
         mainCamera.GetComponent<CameraFollow>().Reset();
         wall.GetComponent<WallSpawner>().Reset();
+        spawnFollower.GetComponent<SpawnerController>().Reset();
         // restart spawner & everything else here
     }
 
     public void GameEnded()
     {
         GameState = GameState.GameEnd;
+        SpawnerController.Instance.StopSpawning();
     }
 }

@@ -11,6 +11,22 @@ public class SwipeControl : MonoBehaviour
     public ArrowDirection swipeDirection;
     public bool hasSwiped = false;
 
+    public static SwipeControl Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        player = FindFirstObjectByType<Player>();
+    }
+
     private void Update()
     {
         DetectSwipe();
@@ -52,6 +68,7 @@ public class SwipeControl : MonoBehaviour
             {
                 endPos = Input.mousePosition;
                 SwipeHandler();
+                hasSwiped = true;
             }
         }
     }

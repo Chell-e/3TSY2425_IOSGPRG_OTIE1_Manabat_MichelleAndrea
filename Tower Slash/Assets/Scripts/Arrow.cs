@@ -19,10 +19,7 @@ public class Arrow : MonoBehaviour
     public ArrowDirection arrowDirection;
     public ArrowType arrowType;
 
-    public GameObject player;
     public GameObject enemy;
-
-    public SwipeControl swipeControl;
     public bool isCorrectSwipe = false;
 
     void Start()
@@ -52,16 +49,16 @@ public class Arrow : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        swipeControl.hasSwiped = false;
+        SwipeControl.Instance.hasSwiped = false;
     }
 
     void OnTriggerStay(Collider other)
     {
         if (other.gameObject.name == "Player")
         {
-            if (swipeControl.hasSwiped)
+            if (SwipeControl.Instance.hasSwiped)
             {
-                ArrowDirection swipeDirection = swipeControl.GetSwipeDirection();
+                ArrowDirection swipeDirection = SwipeControl.Instance.GetSwipeDirection();
 
                 Debug.Log("Arrow Direction: " + arrowDirection);
                 Debug.Log("Swipe Direction: " + swipeDirection);
@@ -80,10 +77,10 @@ public class Arrow : MonoBehaviour
                     Debug.Log("Correct swipe!");
                     Destroy(gameObject);
 
-                    if (enemy != null)
-                    {
-                        Destroy(enemy);
-                    }
+                    //if (enemy != null)
+                    //{
+                    //    Destroy(enemy);
+                    //}
                 }
                 else
                 {

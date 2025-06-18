@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     private static Player _instance;
 
     [SerializeField] private float movementSpeed;
+    //[SerializeField] private int life = 3;
 
     private Vector3 originalPos;
 
@@ -83,5 +84,6 @@ public class Player : MonoBehaviour
     public void Reset()
     {
         this.transform.position = originalPos;
+        //life = 3;
     }
 }
