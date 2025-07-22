@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class Player : MonoBehaviour
 {
     private Vector2 move;
     private float threshold = 0.01f;
@@ -13,6 +13,11 @@ public class PlayerMovement : MonoBehaviour
     public Rigidbody2D playerRb;
 
     public float speed;
+
+    //private void Start()
+    //{
+    //    GameManager.Instance.player = this.gameObject;
+    //}
 
     private void Awake()
     {
@@ -68,11 +73,23 @@ public class PlayerMovement : MonoBehaviour
         playerRb.MovePosition(playerRb.position + move * speed * Time.deltaTime);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision) // colliding w obstacles
     {
-        if (collision.gameObject.CompareTag("Obstacle"))
+        Obstacle obstacle = collision.gameObject.GetComponent<Obstacle>();
+        if (obstacle != null)
         {
             Debug.Log("Player collided with " + collision.gameObject.name);
         }
     }
+
+    //private void OnTriggerEnter2D(Collider2D collider) // colliding w ammo
+    //{
+    //    Ammo ammo = collider.GetComponent<Ammo>();
+        
+    //    if (ammo != null)
+    //    {
+    //        Debug.Log("Player picks up " + ammo.ammoType.ToString());
+    //        Destroy(ammo.gameObject);
+    //    }
+    //}
 }
