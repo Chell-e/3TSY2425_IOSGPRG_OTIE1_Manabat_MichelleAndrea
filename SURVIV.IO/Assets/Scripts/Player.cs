@@ -14,14 +14,30 @@ public class Player : MonoBehaviour
 
     public float speed;
 
-    //private void Start()
-    //{
-    //    GameManager.Instance.player = this.gameObject;
-    //}
+    private int currPistolAmmo;
+    private int currRifleAmmo;
+    private int currShotgunAmmo;
+
+    public static Player Instance { get; private set; }
 
     private void Awake()
     {
+        // Singleton
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
         playerRb = GetComponent<Rigidbody2D>();
+    }
+
+    private void Start()
+    {
+        currPistolAmmo = 0;
+        currRifleAmmo = 0;
+        currShotgunAmmo = 0;
+        UpdateAmmoUI();
     }
 
     void Update()
@@ -82,14 +98,28 @@ public class Player : MonoBehaviour
         }
     }
 
-    //private void OnTriggerEnter2D(Collider2D collider) // colliding w ammo
-    //{
-    //    Ammo ammo = collider.GetComponent<Ammo>();
-        
-    //    if (ammo != null)
-    //    {
-    //        Debug.Log("Player picks up " + ammo.ammoType.ToString());
-    //        Destroy(ammo.gameObject);
-    //    }
-    //}
+    public void AddAmmo(AmmoType type, int amount)
+    {
+        switch (type)
+        {
+            case AmmoType.PistolAmmo:
+                currPistolAmmo += amount;
+                break;
+            case AmmoType.RifleAmmo:
+                currRifleAmmo += amount;
+                break;
+            case AmmoType.ShotgunAmmo:
+                currShotgunAmmo += amount;
+                break;
+        }
+
+        UpdateAmmoUI();
+    }
+
+    private void UpdateAmmoUI()
+    {
+        UIManager.Instance.UpdatePistolAmmoCount(currPistolAmmo);
+        UIManager.Instance.UpdateRifleAmmoCount(currRifleAmmo);
+        UIManager.Instance.UpdateShotgunAmmoCount(currShotgunAmmo);
+    }
 }

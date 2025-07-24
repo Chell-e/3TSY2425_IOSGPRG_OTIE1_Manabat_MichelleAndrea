@@ -31,7 +31,7 @@ public class Ammo : MonoBehaviour
         Player player = collider.GetComponent<Player>();
         if (player != null)
         {
-            UIManager.Instance.AddAmmo(ammoType, ammoClip);
+            Player.Instance.AddAmmo(ammoType, ammoClip);
             Destroy(this.gameObject);
         }
     }
