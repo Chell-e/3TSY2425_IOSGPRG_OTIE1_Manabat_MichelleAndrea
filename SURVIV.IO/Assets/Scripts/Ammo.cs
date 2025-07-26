@@ -13,8 +13,6 @@ public class Ammo : MonoBehaviour
     
     [SerializeField] private int ammoClip;
 
-    public int ammoAmount;
-
     private void Start()
     {
         switch(ammoType)

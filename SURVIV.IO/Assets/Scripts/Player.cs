@@ -1,22 +1,29 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour
 {
-    private Vector2 move;
-    private float threshold = 0.01f;
-
-    private Vector2 lastDir = Vector2.up;
-
+    [Header("Joysticks")]
     public Joystick movementJoystick;
     public Joystick directionJoystick;
 
+    [Header("Player Components")]
     public Rigidbody2D playerRb;
+    public Transform playerHand;
 
-    public float speed;
+    [SerializeField] private float speed;
 
+    [Header("Weapon Picked up")]
+    private GameObject currEquippedGun = null;
+
+    [Header("Inventory")]
     private int currPistolAmmo;
     private int currRifleAmmo;
     private int currShotgunAmmo;
+
+    private Vector2 move;
+    private float threshold = 0.01f;
+    private Vector2 lastDir = Vector2.up;
 
     public static Player Instance { get; private set; }
 
@@ -37,6 +44,7 @@ public class Player : MonoBehaviour
         currPistolAmmo = 0;
         currRifleAmmo = 0;
         currShotgunAmmo = 0;
+
         UpdateAmmoUI();
     }
 
@@ -45,7 +53,7 @@ public class Player : MonoBehaviour
         ManagePlayerMovement();
         ManageFacingDirection();
 
-        ScreenBounds();
+        ApplyScreenBounds();
     }
 
     private void ManagePlayerMovement()
@@ -59,7 +67,7 @@ public class Player : MonoBehaviour
         move = new Vector2(move.x, move.y);
     }
 
-    private void ScreenBounds()
+    private void ApplyScreenBounds()
     {
         transform.position = new Vector3(Mathf.Clamp(
             transform.position.x, -102f, 93f),
@@ -89,15 +97,6 @@ public class Player : MonoBehaviour
         playerRb.MovePosition(playerRb.position + move * speed * Time.deltaTime);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision) // colliding w obstacles
-    {
-        Obstacle obstacle = collision.gameObject.GetComponent<Obstacle>();
-        if (obstacle != null)
-        {
-            Debug.Log("Player collided with " + collision.gameObject.name);
-        }
-    }
-
     public void AddAmmo(AmmoType type, int amount)
     {
         switch (type)
@@ -122,4 +121,47 @@ public class Player : MonoBehaviour
         UIManager.Instance.UpdateRifleAmmoCount(currRifleAmmo);
         UIManager.Instance.UpdateShotgunAmmoCount(currShotgunAmmo);
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        Weapon weapon = other.GetComponent<Weapon>();
+
+        if (weapon != null)
+        {
+            if (currEquippedGun != null)
+            {
+                Destroy(currEquippedGun);
+            }
+
+            EquipWeapon(weapon.weaponPrefab, weapon.weaponType);
+            Destroy(other.gameObject);
+        }
+
+    }
+
+    private void EquipWeapon(GameObject gunPrefab, WeaponType gunType)
+    {
+        currEquippedGun = Instantiate(gunPrefab, playerHand.position, playerHand.rotation);
+        currEquippedGun.transform.SetParent(playerHand);
+
+        HandleGunComponents();
+    }
+
+    private void HandleGunComponents()
+    {
+        Collider2D gunCollider = currEquippedGun.GetComponent<Collider2D>();
+        if (gunCollider != null)
+        {
+            gunCollider.enabled = false;
+        }
+
+        Rigidbody2D gunRigidbody = currEquippedGun.GetComponent<Rigidbody2D>();
+        if (gunRigidbody != null)
+        {
+            gunRigidbody.isKinematic = true;
+            gunRigidbody.linearVelocity = Vector2.zero;
+            gunRigidbody.angularVelocity = 0f;
+        }
+    }
+
 }
