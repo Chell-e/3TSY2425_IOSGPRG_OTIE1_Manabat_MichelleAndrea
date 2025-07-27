@@ -148,5 +148,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ammoType: 0
-  ammoClip: 0
-  ammoAmount: 0
+  minAmmo: 1
+  maxAmmo: 8
+  ammoGiven: 0

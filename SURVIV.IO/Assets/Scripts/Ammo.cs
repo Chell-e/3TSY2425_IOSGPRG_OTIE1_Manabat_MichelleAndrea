@@ -10,26 +10,23 @@ public enum AmmoType
 public class Ammo : MonoBehaviour
 {
     public AmmoType ammoType;
-    
-    [SerializeField] private int ammoClip;
 
+    [SerializeField] private int minAmmo;
+    [SerializeField] private int maxAmmo;
+
+    [SerializeField] private int ammoGiven;
+    
     private void Start()
     {
-        switch(ammoType)
-        {
-            case AmmoType.PistolAmmo: ammoClip = 15; break;
-            case AmmoType.RifleAmmo: ammoClip = 30; break;
-            case AmmoType.ShotgunAmmo: ammoClip = 2; break;
-            default: ammoClip = 0; break;
-        }
+        ammoGiven = Random.Range(minAmmo, maxAmmo + 1);
     }
-    
+
     private void OnTriggerEnter2D(Collider2D collider)
     {
         Player player = collider.GetComponent<Player>();
         if (player != null)
         {
-            Player.Instance.AddAmmo(ammoType, ammoClip);
+            Player.Instance.AddAmmo(ammoType, ammoGiven);
             Destroy(this.gameObject);
         }
     }

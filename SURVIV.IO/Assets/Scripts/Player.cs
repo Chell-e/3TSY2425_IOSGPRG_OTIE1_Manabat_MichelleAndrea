@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour
@@ -15,6 +17,7 @@ public class Player : MonoBehaviour
 
     [Header("Weapon Picked up")]
     private GameObject currEquippedGun = null;
+    private Weapon currWeapon = null;
 
     [Header("Inventory")]
     private int currPistolAmmo;
@@ -46,6 +49,9 @@ public class Player : MonoBehaviour
         currShotgunAmmo = 0;
 
         UpdateAmmoUI();
+
+        UIManager.Instance.UpdateAmmoInInventory(0);
+        UIManager.Instance.UpdateCurrentClip(0);
     }
 
     void Update()
@@ -54,6 +60,17 @@ public class Player : MonoBehaviour
         ManageFacingDirection();
 
         ApplyScreenBounds();
+
+        if (currWeapon != null)
+        {
+            int ammoCount = GetAmmoCountForWeaponType(currWeapon.weaponType);
+            UIManager.Instance.UpdateAmmoInInventory(ammoCount);
+
+            if (currWeapon != null && currWeapon.currClip == 0 && GetAmmoCountForWeaponType(currWeapon.weaponType) > 0)
+            {
+                ReloadAutomatically();
+            }
+        }
     }
 
     private void ManagePlayerMovement()
@@ -115,7 +132,7 @@ public class Player : MonoBehaviour
         UpdateAmmoUI();
     }
 
-    private void UpdateAmmoUI()
+    public void UpdateAmmoUI()
     {
         UIManager.Instance.UpdatePistolAmmoCount(currPistolAmmo);
         UIManager.Instance.UpdateRifleAmmoCount(currRifleAmmo);
@@ -128,15 +145,35 @@ public class Player : MonoBehaviour
 
         if (weapon != null)
         {
-            if (currEquippedGun != null)
-            {
-                Destroy(currEquippedGun);
-            }
+            DiscardWeapon();
 
             EquipWeapon(weapon.weaponPrefab, weapon.weaponType);
             Destroy(other.gameObject);
         }
+    }
 
+    private void DiscardWeapon()
+    {
+        if (currEquippedGun != null)
+        {
+            Destroy(currEquippedGun);
+            currWeapon = null;
+        }
+    }
+
+    public int GetAmmoCountForWeaponType(WeaponType type)
+    {
+        switch (type)
+        {
+            case WeaponType.Pistol:
+                return currPistolAmmo;
+            case WeaponType.AutomaticRifle:
+                return currRifleAmmo;
+            case WeaponType.Shotgun:
+                return currShotgunAmmo;
+            default:
+                return 0;
+        }
     }
 
     private void EquipWeapon(GameObject gunPrefab, WeaponType gunType)
@@ -144,7 +181,22 @@ public class Player : MonoBehaviour
         currEquippedGun = Instantiate(gunPrefab, playerHand.position, playerHand.rotation);
         currEquippedGun.transform.SetParent(playerHand);
 
+        currWeapon = currEquippedGun.GetComponent<Weapon>();
+        if (currWeapon == null)
+            return;
+
         HandleGunComponents();
+
+        int ammoCount = GetAmmoCountForWeaponType(gunType);
+        UIManager.Instance.UpdateAmmoInInventory(ammoCount);
+        
+        int clipSize = currWeapon.clipCapacity;
+        currWeapon.currClip = clipSize;
+        
+        if (ammoCount > 0)
+        {
+            UIManager.Instance.UpdateCurrentClip(clipSize);
+        }
     }
 
     private void HandleGunComponents()
@@ -164,4 +216,51 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void HandleFiring()
+    {
+        if (currWeapon == null)
+            return;
+
+        bool didFire = currWeapon.Fire();
+
+        if (!didFire && currWeapon.currClip == 0)
+        {
+            ReloadAutomatically();
+        }
+    }
+
+    private void ReloadAutomatically()
+    {
+        if (currWeapon == null) 
+            return;
+
+        TrackBulletsUsed();
+        UpdateAmmoUI();
+        UIManager.Instance.UpdateAmmoInInventory(GetAmmoCountForWeaponType(currWeapon.weaponType));
+    }
+
+    private void TrackBulletsUsed()
+    {
+        int inventoryAmmo = GetAmmoCountForWeaponType(currWeapon.weaponType);
+        if (inventoryAmmo <= 0 || currWeapon.currClip >= currWeapon.clipCapacity)
+            return;
+
+
+        int bulletsUsed = currWeapon.Reload(inventoryAmmo);
+        if (bulletsUsed <= 0)
+            return;
+
+        switch (currWeapon.weaponType)
+        {
+            case WeaponType.Pistol:
+                currPistolAmmo -= bulletsUsed;
+                break;
+            case WeaponType.AutomaticRifle:
+                currRifleAmmo -= bulletsUsed;
+                break;
+            case WeaponType.Shotgun:
+                currShotgunAmmo -= bulletsUsed;
+                break;
+        }
+    }
 }

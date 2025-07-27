@@ -102,8 +102,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ammoType: 2
-  ammoClip: 0
-  ammoAmount: 0
+  minAmmo: 1
+  maxAmmo: 2
+  ammoGiven: 0
 --- !u!61 &7947848507238368285
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -10,9 +10,12 @@ public class SpawnerManager : MonoBehaviour
     [SerializeField] GameObject[] ammoPrefabs;
     [SerializeField] GameObject[] weaponPrefabs;
 
-    [Header("Initialization")]
-    [SerializeField] private int initialAmmo;
-    [SerializeField] private int initialWeapon;
+    [Header("Items to spawn")]
+    [SerializeField] private int maxTotalItemsOnMap;
+
+    [Header("Chances of spawning")]
+    private float ammoSpawnChance = 70f;
+    private float weaponSpawnChance = 30f;
 
     [Header("Map Bounds")]
     [SerializeField] private Vector2 mapMinBounds2D;
@@ -31,51 +34,46 @@ public class SpawnerManager : MonoBehaviour
         }
     }
 
+
     private void Start()
     {
-        StartCoroutine(SpawnAmmoRoutine());
-        StartCoroutine(SpawnWeaponRoutine());
-
+        StartCoroutine(OverallSpawnRoutine());
     }
 
-    IEnumerator SpawnAmmoRoutine()
+    IEnumerator OverallSpawnRoutine()
     {
         while (true)
         {
             currAmmoSpawned.RemoveAll(item => item == null);
+            currWeaponSpawned.RemoveAll(item => item == null);
 
-            int minAmmo = initialAmmo - currAmmoSpawned.Count;
+            int currentTotalItems = currAmmoSpawned.Count + currWeaponSpawned.Count;
+            int itemsNeeded = maxTotalItemsOnMap - currentTotalItems;
 
-            for (int i = 0; i < minAmmo; i++)
+            if (itemsNeeded > 0)
             {
-                SpawnAmmo();
+                for (int i = 0; i < itemsNeeded; i++)
+                {
+                    float rand = Random.Range(0f, 100f); 
+
+                    if (rand < weaponSpawnChance)
+                    {
+                        SpawnWeapon();
+                    }
+                    else
+                    {
+                        SpawnAmmo();
+                    }
+                }
             }
 
             yield return new WaitForSeconds(2f);
         }
     }
 
-    IEnumerator SpawnWeaponRoutine()
-    {
-        while(true)
-        {
-            currWeaponSpawned.RemoveAll(item => item == null);
-
-            int minWeapon = initialWeapon - currWeaponSpawned.Count;
-
-            for (int i = 0; i < minWeapon; i++)
-            {
-                SpawnWeapon();
-            }
-
-            yield return new WaitForSeconds(5f);
-        }
-    }
-    
     private void SpawnAmmo()
     {
-        GameObject ammoObj = ammoPrefabs[Random.Range(0, ammoPrefabs.Length)];
-        
+        GameObject ammoObj = ammoPrefabs[Random.Range(0, ammoPrefabs.Length)];     
         GameObject newAmmo = Instantiate(ammoObj, SpawnRandomPosition(), Quaternion.identity);
 
         currAmmoSpawned.Add(newAmmo);
@@ -84,7 +82,6 @@ public class SpawnerManager : MonoBehaviour
     private void SpawnWeapon()
     {
         GameObject weaponObj = weaponPrefabs[Random.Range(0, weaponPrefabs.Length)];
-
         GameObject newWeapon = Instantiate(weaponObj, SpawnRandomPosition(), Quaternion.identity);
 
         currWeaponSpawned.Add(newWeapon);
@@ -99,6 +96,4 @@ public class SpawnerManager : MonoBehaviour
 
         return spawnPos;
     }
-
-
 }

@@ -213,10 +213,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 2
   weaponPrefab: {fileID: 5854623848296272339}
-  damage: 10
-  fireRate: 2.16
-  bulletsPerShot: 1
-  ammoType: 0
+  fireRate: 0.6
+  nextFire: 0
+  ammoType: 2
+  clipCapacity: 2
+  currClip: 0
   bulletPrefab: {fileID: 4731822594882226001, guid: 78ba438184b599248ba2f249ab8e07f3, type: 3}
   barrel: {fileID: 6076458358979222087}
-  nextBulletFired: 0

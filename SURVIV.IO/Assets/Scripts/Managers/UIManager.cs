@@ -6,10 +6,14 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
-    [Header("Ammo UI")]
+    [Header("Ammo Inventory UI")]
     public TextMeshProUGUI pistolAmmoCountUI;
     public TextMeshProUGUI rifleAmmoCountUI;
     public TextMeshProUGUI shotgunAmmoCountUI;
+
+    [Header("Current Weapon's Ammo UI")]
+    public TextMeshProUGUI ammoInInventoryUI;
+    public TextMeshProUGUI currentClipUI;
 
     private void Awake()
     {
@@ -41,5 +45,15 @@ public class UIManager : MonoBehaviour
     public void UpdateShotgunAmmoCount(int count)
     {
         shotgunAmmoCountUI.text = count.ToString();
+    }
+
+    public void UpdateAmmoInInventory(int count)
+    {
+        ammoInInventoryUI.text = count.ToString();
+    }
+
+    public void UpdateCurrentClip(int count)
+    {
+        currentClipUI.text = count.ToString();
     }
 }
