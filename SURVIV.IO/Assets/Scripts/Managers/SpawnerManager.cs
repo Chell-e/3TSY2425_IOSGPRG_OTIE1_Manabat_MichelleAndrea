@@ -34,7 +34,6 @@ public class SpawnerManager : MonoBehaviour
         }
     }
 
-
     private void Start()
     {
         StartCoroutine(OverallSpawnRoutine());
