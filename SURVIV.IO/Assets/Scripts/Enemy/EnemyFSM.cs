@@ -105,12 +105,24 @@ public class EnemyFSM : MonoBehaviour
         transform.Rotate(0, 0, angle);
 
         this.transform.position = Vector2.MoveTowards(this.transform.position, targetPos, 5 * Time.deltaTime);
+
+        if (Vector2.Distance(this.transform.position, targetPos) < 5)
+        {
+            ChangeState(EnemyState.Attack);
+        }
     }
 
     void AttackUpdate() 
     {
+        if (Vector2.Distance(transform.position, target.transform.position) > 5f)
+        {
+            ChangeState(EnemyState.Seek);
+        }
 
+        if (target == null)
+        {
+            ChangeState(EnemyState.Idle);
+            return;
+        }
     }
-
-
 }

@@ -21,12 +21,14 @@ public class Weapon : MonoBehaviour
     public int clipCapacity;
     public int currClip;
 
-    [Header("Bullet Properties")] 
+    [Header("Bullet Properties")]
+    [SerializeField] int damage;
     public GameObject bulletPrefab;
     public Transform barrel;
 
     public bool Fire()
     {
+        Debug.Log(this.gameObject);
         if (Time.time >= nextFire && currClip > 0)
         {
             nextFire = Time.time + fireRate;
@@ -45,8 +47,6 @@ public class Weapon : MonoBehaviour
                     Debug.Log("No firing mode activated.");
                     break;
             }
-
-
             return true;
         }
 
@@ -55,7 +55,9 @@ public class Weapon : MonoBehaviour
 
     private void PistolFiringMode()
     {
-        Instantiate(bulletPrefab, barrel.position, barrel.rotation);
+        GameObject bullet = Instantiate(bulletPrefab, barrel.position, barrel.rotation);
+        Bullet bulletScript = bullet.GetComponent<Bullet>();
+        bulletScript.damage = damage;
         currClip--;
 
         UIManager.Instance.UpdateCurrentClip(currClip);
@@ -63,7 +65,9 @@ public class Weapon : MonoBehaviour
 
     private void RifleFiringMode()
     {
-        Instantiate(bulletPrefab, barrel.position, barrel.rotation);
+        GameObject bullet = Instantiate(bulletPrefab, barrel.position, barrel.rotation);
+        Bullet bulletScript = bullet.GetComponent<Bullet>();
+        bulletScript.damage = damage;
         currClip--;
 
         UIManager.Instance.UpdateCurrentClip(currClip);
@@ -75,7 +79,10 @@ public class Weapon : MonoBehaviour
         {
             float spread = Random.Range(-20f, 20f);
             Quaternion rotation = Quaternion.Euler(-5, -5, barrel.eulerAngles.z + spread);
-            Instantiate(bulletPrefab, barrel.position, rotation);
+
+            GameObject bullet = Instantiate(bulletPrefab, barrel.position, barrel.rotation);
+            Bullet bulletScript = bullet.GetComponent<Bullet>();
+            bulletScript.damage = damage;
         }
 
         currClip--;

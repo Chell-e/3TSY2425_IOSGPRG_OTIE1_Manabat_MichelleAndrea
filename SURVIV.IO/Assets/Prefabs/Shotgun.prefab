@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1222500896052667777}
   - component: {fileID: 5007941561706337761}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Gun Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6076458358979222087}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
@@ -127,9 +127,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7380124606461516647}
-  - component: {fileID: 8158403543970712433}
   - component: {fileID: 7583643366037468181}
-  m_Layer: 0
+  - component: {fileID: 8158403543970712433}
+  m_Layer: 6
   m_Name: Shotgun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -153,6 +153,28 @@ Transform:
   - {fileID: 6076458358979222087}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7583643366037468181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5854623848296272339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d5882d2ea9a5a74b90c03e2b34714e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponType: 2
+  weaponPrefab: {fileID: 5854623848296272339}
+  fireRate: 0.6
+  nextFire: 0
+  ammoType: 2
+  clipCapacity: 2
+  currClip: 0
+  damage: 10
+  bulletPrefab: {fileID: 4731822594882226001, guid: 78ba438184b599248ba2f249ab8e07f3, type: 3}
+  barrel: {fileID: 6076458358979222087}
 --- !u!61 &8158403543970712433
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -199,24 +221,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &7583643366037468181
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5854623848296272339}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d5882d2ea9a5a74b90c03e2b34714e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponType: 2
-  weaponPrefab: {fileID: 5854623848296272339}
-  fireRate: 0.6
-  nextFire: 0
-  ammoType: 2
-  clipCapacity: 2
-  currClip: 0
-  bulletPrefab: {fileID: 4731822594882226001, guid: 78ba438184b599248ba2f249ab8e07f3, type: 3}
-  barrel: {fileID: 6076458358979222087}

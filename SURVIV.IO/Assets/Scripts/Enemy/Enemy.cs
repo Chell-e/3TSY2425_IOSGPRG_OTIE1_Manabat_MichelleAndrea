@@ -1,7 +1,11 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Enemy : Human
 {
+    [Header("Enemy Health")]
+    public Image healthBar;
+
     [Header("Random Weapons Prefabs")]
     [SerializeField] GameObject[] weaponPrefabs;
 
@@ -43,5 +47,17 @@ public class Enemy : Human
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        Bullet bullet = other.GetComponent<Bullet>();
+        
+        if (bullet)
+        {
+            Destroy(other.gameObject);
+            TakeDamage(bullet.damage);
+            healthBar.fillAmount = health / 100f;
+            Debug.Log("Enemy took damage" + bullet.damage);
+        }
+    }
 
 }

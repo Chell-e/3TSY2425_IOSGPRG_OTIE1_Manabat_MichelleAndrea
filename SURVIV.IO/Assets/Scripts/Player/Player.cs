@@ -49,9 +49,9 @@ public class Player : Human
 
     private void Start()
     {
-        //currPistolAmmo = 0;
-        //currRifleAmmo = 0;
-        //currShotgunAmmo = 0;
+        currPistolAmmo = 0;
+        currRifleAmmo = 0;
+        currShotgunAmmo = 0;
 
         UpdateAmmoUI();
 
@@ -113,16 +113,45 @@ public class Player : Human
 
     public void AddAmmo(AmmoType type, int amount)
     {
+        int result;
+
         switch (type)
         {
             case AmmoType.PistolAmmo:
-                currPistolAmmo  = Mathf.Min(currPistolAmmo + amount, pistolAmmoCap);
+
+            result = currPistolAmmo + amount;
+                if (result >= pistolAmmoCap)
+                {
+                    currPistolAmmo = pistolAmmoCap;
+                }
+                else
+                {
+                    currPistolAmmo += amount;
+                }
                 break;
             case AmmoType.RifleAmmo:
-                currRifleAmmo = Mathf.Min(currPistolAmmo + amount, rifleAmmoCap);
+            result = currRifleAmmo + amount;
+
+                if ((result + amount) > rifleAmmoCap)
+                {
+                    currRifleAmmo = rifleAmmoCap;
+                }
+                else
+                {
+                    currRifleAmmo += amount;
+                }
                 break;
             case AmmoType.ShotgunAmmo:
-                currShotgunAmmo = Mathf.Min(currShotgunAmmo + amount, shotgunAmmoCap);
+            result = currShotgunAmmo + amount;
+
+                if ((result + amount) > shotgunAmmoCap)
+                {
+                    currShotgunAmmo = shotgunAmmoCap;
+                }
+                else
+                {
+                    currShotgunAmmo += amount;
+                } 
                 break;
         }
 
@@ -243,6 +272,11 @@ public class Player : Human
         if (!isFiring)
             return;
 
+        if (currEquippedWeaponScript.currClip == 0) // from below, moved here 
+        {
+            ReloadAutomatically();
+        }
+
         if (currEquippedWeaponScript.weaponType == WeaponType.AutomaticRifle)
         {
             Debug.Log("Firing rifle rn.");
@@ -254,11 +288,6 @@ public class Player : Human
             Debug.Log("Not firing rifle rn.");
             currEquippedWeaponScript.Fire();
             isFiring = false;
-        }
-
-        if (currEquippedWeaponScript.currClip == 0)
-        {
-            ReloadAutomatically();
         }
     }
 
@@ -278,7 +307,7 @@ public class Player : Human
     {
         if (currEquippedWeaponScript == null)
             return;
-
+        
         TrackBulletsFired();
         UpdateAmmoUI();
     }

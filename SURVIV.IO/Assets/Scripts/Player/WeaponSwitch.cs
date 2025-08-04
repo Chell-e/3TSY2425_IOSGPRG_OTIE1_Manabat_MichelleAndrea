@@ -8,10 +8,10 @@ public class WeaponSwitch : MonoBehaviour
 
     [Header("Player's Weapon Inventory")]
     public int currWeaponIndex; // holds the index of the current weapon [0-primary, 1-secondary]
+    public GameObject currWeapon;
 
     public GameObject[] weaponInventory; // array of guns in player's inventory
     public GameObject playerHand; 
-    public GameObject currWeapon; 
 
     private void Awake()
     {
@@ -30,24 +30,36 @@ public class WeaponSwitch : MonoBehaviour
 
     public void AddWeaponInInventory(GameObject weapon)
     {
-        for (int i = 0; i < weaponInventory.Length; i++) // fills the inventory with 2 guns
-        {
-            if (weaponInventory[i] == null)
-            {
-                if (weaponInventory[1 - i] != null) // 1-1 = 0, 1-0 = 1 if 0 has weapon, deactivate it. if 1 has weapon, deactivate it
-                {
-                    weaponInventory[1 - i].SetActive(false); 
-                }
 
-                currWeaponIndex = i;
-                weaponInventory[i] = weapon;
-                weapon.SetActive(true);
-                currWeapon = weapon;
-                return;
-            }
+        WeaponType type = weapon.GetComponent<Weapon>().weaponType;
+
+        switch (type)
+        {
+            case WeaponType.Pistol:
+                currWeaponIndex = 1; // secondary slot only
+                break;
+            case WeaponType.AutomaticRifle: //primary slot either guns
+            case WeaponType.Shotgun:
+                currWeaponIndex = 0;
+                break;
         }
 
-        ReplaceWeapon(weapon);
+        if (weaponInventory[currWeaponIndex] != null)
+        {
+            ReplaceWeapon(weapon);
+        }
+
+        // disable the other slot's weapon when not equipped
+        int otherSlot = 1 - currWeaponIndex;
+        if (weaponInventory[otherSlot] != null)
+        {
+            weaponInventory[otherSlot].SetActive(false);
+        }
+
+        weaponInventory[currWeaponIndex] = weapon;
+        weapon.SetActive(true);
+        currWeapon = weapon;
+
     }
 
     private void ReplaceWeapon(GameObject weapon)

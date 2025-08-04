@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8265816480041756767}
   - component: {fileID: 8881460452209075087}
   - component: {fileID: 7947848507238368285}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 12 gauges
   m_TagString: Untagged
   m_Icon: {fileID: 0}
