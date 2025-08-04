@@ -15,6 +15,7 @@ public class Weapon : MonoBehaviour
     public GameObject weaponPrefab;
     public float fireRate;
     public float nextFire = 0f;
+    public float reloadSpeed;
 
     [Header("Ammo Properties")]
     public AmmoType ammoType;
@@ -26,9 +27,10 @@ public class Weapon : MonoBehaviour
     public GameObject bulletPrefab;
     public Transform barrel;
 
+    public bool isReloading = false;
+
     public bool Fire()
     {
-        Debug.Log(this.gameObject);
         if (Time.time >= nextFire && currClip > 0)
         {
             nextFire = Time.time + fireRate;
@@ -59,8 +61,6 @@ public class Weapon : MonoBehaviour
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.damage = damage;
         currClip--;
-
-        UIManager.Instance.UpdateCurrentClip(currClip);
     }
 
     private void RifleFiringMode()
@@ -69,8 +69,6 @@ public class Weapon : MonoBehaviour
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.damage = damage;
         currClip--;
-
-        UIManager.Instance.UpdateCurrentClip(currClip);
     }
 
     private void ShotgunFiringMode()
@@ -80,13 +78,12 @@ public class Weapon : MonoBehaviour
             float spread = Random.Range(-20f, 20f);
             Quaternion rotation = Quaternion.Euler(-5, -5, barrel.eulerAngles.z + spread);
 
-            GameObject bullet = Instantiate(bulletPrefab, barrel.position, barrel.rotation);
+            GameObject bullet = Instantiate(bulletPrefab, barrel.position, rotation);
             Bullet bulletScript = bullet.GetComponent<Bullet>();
             bulletScript.damage = damage;
         }
 
         currClip--;
-        UIManager.Instance.UpdateCurrentClip(currClip);
     }
 
     public int Reload(int inventoryAmmo)
@@ -104,9 +101,27 @@ public class Weapon : MonoBehaviour
         }
 
         currClip += bulletsToReload;
-        UIManager.Instance.UpdateCurrentClip(currClip);
 
         return bulletsToReload;
+    }
+
+    public void StartReload(int inventoryAmmo, System.Action<int> onReloadComplete = null)
+    {
+        if (!isReloading && currClip < clipCapacity)
+        {
+            StartCoroutine(ReloadCoroutine(inventoryAmmo, onReloadComplete));
+        }
+    }
+    
+    private IEnumerator ReloadCoroutine(int inventoryAmmo, System.Action<int> onReloadComplete)
+    {
+        isReloading = true;
+        yield return new WaitForSeconds(reloadSpeed);
+
+        int bulletsReloaded = Reload(inventoryAmmo);
+        isReloading = false;
+
+        onReloadComplete?.Invoke(bulletsReloaded);
     }
 
 }

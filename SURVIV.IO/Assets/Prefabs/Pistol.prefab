@@ -52,6 +52,7 @@ MonoBehaviour:
   weaponPrefab: {fileID: 1855213514421536633}
   fireRate: 2.16
   nextFire: 0
+  reloadSpeed: 2
   ammoType: 0
   clipCapacity: 15
   currClip: 0

@@ -19,6 +19,9 @@ public class EnemyFSM : MonoBehaviour
     Vector2 randomPos = Vector2.zero;
     bool isMoving = false;
 
+    [SerializeField] float shootCooldown = 1.5f;
+    private float shootTimer = 0f;
+
     private void Update()
     {
         switch(currState)
@@ -36,6 +39,8 @@ public class EnemyFSM : MonoBehaviour
                 AttackUpdate();
                 break;
         }
+
+        shootTimer -= Time.deltaTime;
     }
 
     void ChangeState(EnemyState state)
@@ -114,15 +119,21 @@ public class EnemyFSM : MonoBehaviour
 
     void AttackUpdate() 
     {
-        if (Vector2.Distance(transform.position, target.transform.position) > 5f)
-        {
-            ChangeState(EnemyState.Seek);
-        }
-
         if (target == null)
         {
             ChangeState(EnemyState.Idle);
             return;
+        }
+
+        if (Vector2.Distance(transform.position, target.transform.position) > 5f)
+        {
+            ChangeState(EnemyState.Seek);
+        }
+       
+        if (shootTimer <= 0f)
+        {
+            GetComponent<Enemy>().AttackTarget(target);
+            shootTimer = shootCooldown;
         }
     }
 }

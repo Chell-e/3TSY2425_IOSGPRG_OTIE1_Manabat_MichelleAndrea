@@ -11,6 +11,7 @@ public class Enemy : Human
 
     [Header("Weapon Equipped")]
     [SerializeField] GameObject currEquippedWeaponObj;
+    [SerializeField] public int ammo;
 
     [Header("Enemy Components")]
     [SerializeField] Transform enemyHand;
@@ -28,6 +29,9 @@ public class Enemy : Human
         currEquippedWeaponObj.transform.SetParent(enemyHand);
 
         DisableGunComponents();
+
+        Weapon currEquippedWeaponScript = currEquippedWeaponObj.GetComponent<Weapon>();
+        currEquippedWeaponScript.currClip = currEquippedWeaponScript.clipCapacity;
     }
 
     private void DisableGunComponents()
@@ -51,13 +55,26 @@ public class Enemy : Human
     {
         Bullet bullet = other.GetComponent<Bullet>();
         
-        if (bullet)
+        if (bullet != null)
         {
             Destroy(other.gameObject);
             TakeDamage(bullet.damage);
             healthBar.fillAmount = health / 100f;
-            Debug.Log("Enemy took damage" + bullet.damage);
+            Debug.Log("Enemy took damage " + bullet.damage);
         }
     }
 
+    public void AttackTarget(Human target)
+    {
+        Weapon currEquippedWeaponScript = currEquippedWeaponObj.GetComponent<Weapon>();
+         
+
+        if (currEquippedWeaponScript.currClip <= 0)
+        {
+            ammo -= currEquippedWeaponScript.clipCapacity;
+            currEquippedWeaponScript.Reload(ammo);
+            return; 
+        }
+        currEquippedWeaponScript.Fire();
+    }
 }

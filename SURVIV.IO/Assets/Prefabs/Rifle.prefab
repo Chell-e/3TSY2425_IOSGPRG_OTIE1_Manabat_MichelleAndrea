@@ -82,12 +82,14 @@ MonoBehaviour:
   weaponPrefab: {fileID: 6280242515462078522}
   fireRate: 0.35
   nextFire: 0
+  reloadSpeed: 2.3
   ammoType: 1
   clipCapacity: 30
   currClip: 0
   damage: 15
   bulletPrefab: {fileID: 4731822594882226001, guid: 78ba438184b599248ba2f249ab8e07f3, type: 3}
   barrel: {fileID: 1024884881929796604}
+  isReloading: 0
 --- !u!61 &2483044151123731099
 BoxCollider2D:
   m_ObjectHideFlags: 0

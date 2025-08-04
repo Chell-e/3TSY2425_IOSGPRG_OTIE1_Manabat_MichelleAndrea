@@ -2,9 +2,13 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Player : Human
 {
+    [Header("Player Health")]
+    public Image healthBar;
+
     [Header("Joysticks")]
     public Joystick movementJoystick;
     public Joystick directionJoystick;
@@ -20,7 +24,7 @@ public class Player : Human
     [Header("Ammo Inventory")]
     [SerializeField] public int currPistolAmmo;
     [SerializeField] public int currRifleAmmo;
-    [SerializeField]public int currShotgunAmmo;
+    [SerializeField] public int currShotgunAmmo;
     private const int pistolAmmoCap = 90;
     private const int rifleAmmoCap = 120;
     private const int shotgunAmmoCap = 60;
@@ -119,7 +123,7 @@ public class Player : Human
         {
             case AmmoType.PistolAmmo:
 
-            result = currPistolAmmo + amount;
+                result = currPistolAmmo + amount;
                 if (result >= pistolAmmoCap)
                 {
                     currPistolAmmo = pistolAmmoCap;
@@ -130,7 +134,7 @@ public class Player : Human
                 }
                 break;
             case AmmoType.RifleAmmo:
-            result = currRifleAmmo + amount;
+                result = currRifleAmmo + amount;
 
                 if ((result + amount) > rifleAmmoCap)
                 {
@@ -142,7 +146,7 @@ public class Player : Human
                 }
                 break;
             case AmmoType.ShotgunAmmo:
-            result = currShotgunAmmo + amount;
+                result = currShotgunAmmo + amount;
 
                 if ((result + amount) > shotgunAmmoCap)
                 {
@@ -151,7 +155,7 @@ public class Player : Human
                 else
                 {
                     currShotgunAmmo += amount;
-                } 
+                }
                 break;
         }
 
@@ -166,7 +170,7 @@ public class Player : Human
 
         if (currEquippedWeaponScript != null)
         {
-            UIManager.Instance.UpdateAmmoInInventory(GetAmmoCountForWeaponType(currEquippedWeaponScript.weaponType)); 
+            UIManager.Instance.UpdateAmmoInInventory(GetAmmoCountForWeaponType(currEquippedWeaponScript.weaponType));
 
         }
     }
@@ -177,15 +181,19 @@ public class Player : Human
 
         if (weapon != null)
         {
-            //if (currEquippedWeaponGameObj != null)
-            //{
-            //    DiscardWeapon();
-            //}
-
             EquipWeapon(weapon.weaponPrefab, weapon.weaponType);
             Destroy(other.gameObject); // destroys gun on the ground
 
             LoadAmmoIntoClip(weapon.weaponType);
+        }
+
+        Bullet bullet = other.GetComponent<Bullet>();
+        if (bullet)
+        {
+            Destroy(other.gameObject);
+            TakeDamage(bullet.damage);
+            healthBar.fillAmount = health / 100f;
+            Debug.Log("Player took damage " + bullet.damage);
         }
     }
 
@@ -207,12 +215,6 @@ public class Player : Human
         {
             ammoToLoadInClip = clipCapacity;
         }
-    }
-
-    private void DiscardWeapon()
-    {
-        Destroy(currEquippedWeaponGameObj); 
-        currEquippedWeaponScript = null;
     }
 
     public int GetAmmoCountForWeaponType(WeaponType type)
@@ -242,7 +244,7 @@ public class Player : Human
         currEquippedWeaponScript = currEquippedWeaponGameObj.GetComponent<Weapon>();
 
         HandleGunComponents();
-        ReloadAutomatically(); 
+        ReloadAutomatically();
 
         UIManager.Instance.UpdateCurrentClip(currEquippedWeaponScript.currClip);
     }
@@ -281,12 +283,14 @@ public class Player : Human
         {
             Debug.Log("Firing rifle rn.");
             currEquippedWeaponScript.Fire();
+            UIManager.Instance.UpdateCurrentClip(currEquippedWeaponScript.currClip);
             rifleCooldownTimer = rifleCooldown;
         }
         else
         {
             Debug.Log("Not firing rifle rn.");
             currEquippedWeaponScript.Fire();
+            UIManager.Instance.UpdateCurrentClip(currEquippedWeaponScript.currClip);
             isFiring = false;
         }
     }
@@ -294,46 +298,41 @@ public class Player : Human
     public void HoldFireButton()
     {
         isFiring = true;
-        Debug.Log("isAutoFiring true");
     }
 
     public void ReleaseFireButton()
     {
         isFiring = false;
-        Debug.Log("isAutoFiring false");
     }
 
     private void ReloadAutomatically()
     {
-        if (currEquippedWeaponScript == null)
+        if (currEquippedWeaponScript == null || currEquippedWeaponScript.isReloading)
             return;
-        
-        TrackBulletsFired();
-        UpdateAmmoUI();
-    }
 
-    private void TrackBulletsFired()
-    {
         int inventoryAmmo = GetAmmoCountForWeaponType(currEquippedWeaponScript.weaponType);
-        if (inventoryAmmo <= 0 || currEquippedWeaponScript.currClip >= currEquippedWeaponScript.clipCapacity)
-            return;
 
-        int bulletsUsed = currEquippedWeaponScript.Reload(inventoryAmmo);
-        if (bulletsUsed <= 0)
-            return;
-
-        switch (currEquippedWeaponScript.weaponType)
+        currEquippedWeaponScript.StartReload(inventoryAmmo, (bulletsUsed) =>
         {
-            case WeaponType.Pistol:
-                currPistolAmmo -= bulletsUsed;
-                break;
-            case WeaponType.AutomaticRifle:
-                currRifleAmmo -= bulletsUsed;
-                break;
-            case WeaponType.Shotgun:
-                currShotgunAmmo -= bulletsUsed;
-                break;
-        }
+            if (bulletsUsed <= 0) 
+                return;
+
+            switch (currEquippedWeaponScript.weaponType)
+            {
+                case WeaponType.Pistol:
+                    currPistolAmmo -= bulletsUsed; 
+                    break;
+                case WeaponType.AutomaticRifle:
+                    currRifleAmmo -= bulletsUsed; 
+                    break;
+                case WeaponType.Shotgun:
+                    currShotgunAmmo -= bulletsUsed;
+                    break;
+            }
+
+            UpdateAmmoUI();
+            UIManager.Instance.UpdateCurrentClip(currEquippedWeaponScript.currClip);
+        });
     }
 
     public void UpdateEquippedWeapon(GameObject weaponObj)

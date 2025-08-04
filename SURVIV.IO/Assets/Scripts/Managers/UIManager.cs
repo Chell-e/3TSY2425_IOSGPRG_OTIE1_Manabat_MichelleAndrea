@@ -56,4 +56,5 @@ public class UIManager : MonoBehaviour
     {
         currentClipUI.text = count.ToString();
     }
+
 }
